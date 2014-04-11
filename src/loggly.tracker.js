@@ -1,9 +1,11 @@
 (function(window, document) {
-    var LOGGLY_INPUT_PREFIX = 'http' + ( ('https:' === document.location.protocol ? 's' : '') ) + '://',
+    //Force SSL because in a chrome app the detection falls to http
+    var LOGGLY_INPUT_PREFIX = 'https://',
         LOGGLY_COLLECTOR_DOMAIN = 'logs-01.loggly.com',
-        LOGGLY_INPUT_SUFFIX = '.gif?',
+        LOGGLY_INPUT_SUFFIX = '/tag/https/',
         LOGGLY_SESSION_KEY = 'logglytrackingsession',
-        LOGGLY_SESSION_KEY_LENGTH = LOGGLY_SESSION_KEY.length + 1;
+        LOGGLY_SESSION_KEY_LENGTH = LOGGLY_SESSION_KEY.length + 1,
+        TIMEOUT = 2000;
 
     function uuid() {
         // lifted from here -> http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/2117523#2117523
@@ -88,9 +90,12 @@
             data.sessionId = this.session_id;
         
             try {
-                var im = new Image(),
-                    q = 'PLAINTEXT=' + encodeURIComponent(JSON.stringify(data));
-                im.src = this.inputUrl + q;
+                var xhr = new window.XMLHttpRequest();
+
+                xhr.open("POST", this.inputUrl, true);
+                xhr.timeout = TIMEOUT;
+                xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+                xhr.send(JSON.stringify(data));
             } catch (ex) {
                 if (window && window.console && typeof window.console.log === 'function') {
                     console.log("Failed to log to loggly because of this exception:\n" + ex);
