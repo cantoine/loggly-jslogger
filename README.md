@@ -42,3 +42,6 @@ separate logging instace:
 var myBetterLogger = new LogglyTracker();
 myBetterLogger.push({'logglyKey': '8c518f97-e3e0-4bfb-a8ed-582d084a5289' });  // push a loggly key to initialize
 ```
+
+** Changes from Source **
+The endpoint has been modified to use the https API endpoint and instead of using an image an XHR POST is fired off.
